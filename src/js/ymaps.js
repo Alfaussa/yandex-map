@@ -1,4 +1,5 @@
-import { map } from "jquery";
+// import { map } from "jquery";
+ymaps.ready(mapInit);
 
 function mapInit() {
     ymaps.ready(() => {
@@ -8,13 +9,48 @@ function mapInit() {
             controls: ['zoomControl'],
             behavoirs:['drag']
         });
-        var placemark = new ymaps.Placemark([55.76, 37.30], {
-        
-    });
-})
-map.geoObjects.add(placemark);
+        // function placemarkInit() {
+        //     document.addEventListener('click', () =>{
+              
+        //         var placemark = new ymaps.Placemark([55.76, 37.64], {
+        //             // hintContent:'this is hint', 
+        //             balloonContent: [
+        //               '  <div class = \'form\'>',
+        //                 '<h3>Отзыв:</h3>',
+        //                 '<input placeholder=\'Укажите ваше имя\'> </input>',
+        //                 '<input placeholder=\'Укажите ваше место\'> </input>',
+        //                 '<textarea placeholder=\'Укажите ваше место\'></textarea>',
+        //                 '</div>'
+        //             ].join('')
+        //     });
+        //     city.geoObjects.add(placemark);
+        //     })
+        // }
+        // placemarkInit();
+    city.events.add('click', function (e) {
+            if (!city.balloon.isOpen()) {
+                var placemark = new ymaps.Placemark(coords)
+                var coords = e.get('coords');
+                
+            city.balloon.open(coords, {
+                    contentHeader:'Отзывы:',
+                    contentBody:[
+                        '<div class = \'form\'>',
+                        '<input placeholder=\'Укажите ваше имя\'> </input>',
+                        '<input placeholder=\'Укажите ваше место\'> </input>',
+                        '<textarea placeholder=\'Укажите ваше место\'></textarea>',
+                        '</div>'
+                      ].join('')
+                });
+            }
+            else {
+                city.balloon.close();
+                var placemark = new ymaps.Placemark(coords);
+                city.geoObjects.add(placemark);
 
-}
-export {
-    mapInit
+            }
+        });
+
+})
+
 }
