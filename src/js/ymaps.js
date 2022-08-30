@@ -28,8 +28,9 @@ function mapInit() {
         // }
         // placemarkInit();
     city.events.add('click', function (e) {
+
             if (!city.balloon.isOpen()) {
-                var placemark = new ymaps.Placemark(coords)
+               
                 var coords = e.get('coords');
                 
             city.balloon.open(coords, {
@@ -45,7 +46,10 @@ function mapInit() {
             }
             else {
                 city.balloon.close();
-                var placemark = new ymaps.Placemark(coords);
+                placemark = new ymaps.Placemark(city.getCenter(), {
+                    hintContent: 'Собственный значок метки',
+                    balloonContent: 'Это красивая метка'
+                } )
                 city.geoObjects.add(placemark);
 
             }
