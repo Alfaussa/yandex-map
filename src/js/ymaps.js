@@ -17,11 +17,17 @@ function mapInit() {
     city.events.add('click', function (e) {
         var coords = e.get('coords');
         
-        openBallon(city, coords, []);
+        openBalloon(city, coords, []);
 
     })
     clusterer = new ymaps.Clusterer({clusterDisableClickZoom:true})
+    clusterer.options.set('hasBalloon', false);
     renderGeoObjects(city);
+
+    clusterer.events.add('click', function(e){
+        let geoObjectsInClaster = e.get('target').getGeoObjects()
+        openBalloon(city, e.get('coords'), geoObjectsInClaster)
+    })
 
 })
 }
@@ -38,9 +44,8 @@ function getReviewList(currentGeoObjects){
         if(currentGeoObjects.some(geoObject => JSON.stringify(geoObject.geometry._coordinates) === JSON.stringify(review.coords))){
             reviewListHTML += `
             <div class='review'>
-                <div> <strong> Место: </strong> ${review.place}</div>
-                <div> <strong> Имя: </strong> ${review.author}</div>
-                <div> <strong> Отзыв: </strong> ${review.reviewText}</div>
+            <span class='author-name'> ${review.author }  </span><span class='place-name'>${review.place}</span>
+            <div class='place-name'>${review.reviewText}</div>
             </div>    
             `
     }
@@ -48,28 +53,30 @@ function getReviewList(currentGeoObjects){
 return reviewListHTML;
 }
 
-function renderGeoObjects(city) {
+function renderGeoObjects(map) {
     const geoObjects = [];
 
     for(const review of getReviewsFromLS()){
         const placemark = new ymaps.Placemark(review.coords)
         placemark.events.add('click', e => {
             e.stopPropagation()
-            openBallon(city, e.get('coords'), [e.get('target')] )
+            openBalloon(map, e.get('coords'), [e.get('target')] )
         })
         geoObjects.push(placemark)
     }
     clusterer.removeAll()
-    city.geoObjects.remove(clusterer)
+    map.geoObjects.remove(clusterer)
     clusterer.add(geoObjects)
-    city.geoObjects.add(clusterer)
+    map.geoObjects.add(clusterer)
 }
 
-async function openBallon(city, coords, currentGeoObjects){
-    await city.balloon.open(coords, {
-                            contentHeader:'Отзывы:',
-                            contentBody:
-                                `<div class='reviews'>${getReviewList(currentGeoObjects)}</div>` + form
+async function openBalloon(map, coords, currentGeoObjects){
+    await map.balloon.open(coords, {
+                        
+                            content:
+                                `<div class='content'><div class='reviews'>${getReviewList(currentGeoObjects)}</div></div> 
+                                <div class='content'><h3>Отзыв:</h3>` + form
+                                
                         });
 document.querySelector('#add-form').addEventListener('submit', function(e){
     e.preventDefault();
@@ -81,9 +88,9 @@ document.querySelector('#add-form').addEventListener('submit', function(e){
     }
     localStorage.reviews = JSON.stringify([...getReviewsFromLS(), review])
 
-    renderGeoObjects(city)
+    renderGeoObjects(map)
 
-    city.balloon.close();
+    map.balloon.close();
 })
 
 }
