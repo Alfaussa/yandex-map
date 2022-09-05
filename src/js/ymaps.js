@@ -1,12 +1,13 @@
-const { map } = require("jquery");
+
 import {form} from '../templates/form'
-export {mapInit}
-document.addEventListener('DOMContentLoaded', () => ymaps.ready(mapInit));
+export {init}
+document.addEventListener('DOMContentLoaded', () => ymaps.ready(init));
 
 let clusterer;
 
-function mapInit() {
-    ymaps.ready(() => {
+
+
+function init() {
         let city = new ymaps.Map('map', {
             center: [55.76, 37.65],
             zoom: 12,
@@ -15,7 +16,7 @@ function mapInit() {
         });
       
     city.events.add('click', function (e) {
-        var coords = e.get('coords');
+        const coords = e.get('coords');
         
         openBalloon(city, coords, []);
 
@@ -26,10 +27,9 @@ function mapInit() {
 
     clusterer.events.add('click', function(e){
         let geoObjectsInClaster = e.get('target').getGeoObjects()
-        openBalloon(city, e.get('coords'), geoObjectsInClaster)
-    })
+        openBalloon(city, e.get('coords'), geoObjectsInClaster);
 
-})
+    })
 }
 
 function getReviewsFromLS(){
@@ -59,8 +59,8 @@ function renderGeoObjects(map) {
     for(const review of getReviewsFromLS()){
         const placemark = new ymaps.Placemark(review.coords)
         placemark.events.add('click', e => {
-            e.stopPropagation()
-            openBalloon(map, e.get('coords'), [e.get('target')] )
+            e.stopPropagation();
+            openBalloon(map, review.coords, [e.get('target')] )
         })
         geoObjects.push(placemark)
     }

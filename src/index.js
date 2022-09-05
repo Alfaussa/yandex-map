@@ -1,3 +1,3 @@
-import { mapInit } from "./js/ymaps";
+import { init } from "./js/ymaps";
 
-mapInit()
+init()
